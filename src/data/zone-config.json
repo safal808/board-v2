@@ -37,6 +37,18 @@
       "description": "Data visualization and analytics"
     },
     {
+      "name": "retrieved-data-zone",
+      "label": "Raw Data Zone - On Request Retrieved Data",
+      "x": 4200,
+      "y": -4600,
+      "width": 2000,
+      "height": 2100,
+      "color": "#9C27B0",
+      "gradient": "linear-gradient(135deg, rgba(156, 39, 176, 0.1) 0%, rgba(142, 36, 170, 0.15) 50%, rgba(156, 39, 176, 0.1) 100%)",
+      "borderGradient": "linear-gradient(135deg, #8E24AA 0%, #9C27B0 100%)",
+       "description": "Data visualization and analytics"
+    },
+    {
       "name": "task-management-zone",
       "label": "Task Management Zone",
       "x": 4200,

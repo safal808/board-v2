@@ -47,7 +47,8 @@
     "dev": "concurrently \"npm run server\" \"npm start\"",
     "install-server": "npm install express cors",
     "test-api": "node test-api.js",
-    "test-enhanced": "node test-enhanced-todo.js"
+    "test-enhanced": "node test-enhanced-todo.js",
+    "test-ehr-data": "node test-ehr-data.js"
   },
   "eslintConfig": {
     "extends": [

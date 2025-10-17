@@ -207,6 +207,81 @@ const StickyContent = styled.div`
       flex-grow: 1;
     `;
 
+    // ===== EHR Data Styles =====
+    const EHRDataCard = styled.div`
+      width: 100%;
+      min-height: 100%;
+      height: auto;
+      display: flex;
+      flex-direction: column;
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid #e0e0e0;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      overflow: visible;
+    `;
+
+    const EHRDataHeader = styled.div`
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+      border-bottom: 1px solid #e9d5ff;
+    `;
+
+    const EHRDataTitle = styled.div`
+      font-size: 14px;
+      font-weight: 800;
+      color: #581c87;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    `;
+
+    const EHRDataSource = styled.div`
+      font-size: 11px;
+      font-weight: 600;
+      color: #7c3aed;
+      background: rgba(124, 58, 237, 0.1);
+      padding: 2px 8px;
+      border-radius: 12px;
+    `;
+
+    const EHRDataBody = styled.div`
+      padding: 12px 14px;
+      overflow: visible;
+      color: #111827;
+      font-size: 13px;
+      line-height: 1.5;
+      white-space: normal;
+      flex-grow: 1;
+    `;
+
+    const EHRDataType = styled.div`
+      font-size: 11px;
+      font-weight: 600;
+      color: #7c3aed;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    `;
+
+    const EHRDataContent = styled.div`
+      color: #374151;
+      margin-bottom: 8px;
+      white-space: pre-wrap;
+    `;
+
+    const EHRDataTimestamp = styled.div`
+      font-size: 10px;
+      color: #9ca3af;
+      font-style: italic;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid #f3f4f6;
+    `;
+
 
     // Very small markdown -> HTML converter (headings, bold, italic, code, lists)
     const toHtml = (md: string) => {
@@ -539,6 +614,25 @@ const BoardItem = ({
                   </div>
                 );
             }
+
+          case 'ehr-data':
+            return (
+              <EHRDataCard>
+                <EHRDataHeader>
+                  <EHRDataTitle>🏥 {item.title || 'EHR Data'}</EHRDataTitle>
+                  <EHRDataSource>{item.source || 'EHR System'}</EHRDataSource>
+                </EHRDataHeader>
+                <EHRDataBody>
+                  <EHRDataType>{item.dataType || 'clinical'}</EHRDataType>
+                  <EHRDataContent>{item.content || 'No content available'}</EHRDataContent>
+                  {item.timestamp && (
+                    <EHRDataTimestamp>
+                      Retrieved: {new Date(item.timestamp).toLocaleString()}
+                    </EHRDataTimestamp>
+                  )}
+                </EHRDataBody>
+              </EHRDataCard>
+            );
        
        default:
          return null;
@@ -552,8 +646,8 @@ const BoardItem = ({
         left: item.x,
         top: item.y,
         width: item.width,
-        height: (item.type === 'agent' || item.type === 'todo' || item.type === 'lab-result' || item.type === 'component') ? 'auto' : item.height,
-        minHeight: (item.type === 'agent' || item.type === 'todo' || item.type === 'lab-result' || item.type === 'component') ? (item.height === 'auto' ? '200px' : item.height) : 'auto',
+        height: (item.type === 'agent' || item.type === 'todo' || item.type === 'lab-result' || item.type === 'component' || item.type === 'ehr-data') ? 'auto' : item.height,
+        minHeight: (item.type === 'agent' || item.type === 'todo' || item.type === 'lab-result' || item.type === 'component' || item.type === 'ehr-data') ? (item.height === 'auto' ? '200px' : item.height) : 'auto',
         transform: `rotate(${item.rotation}deg)`,
         backgroundColor: item.color,
         border: isSelected ? '2px solid #2196f3' : '1px solid rgba(0,0,0,0.1)',

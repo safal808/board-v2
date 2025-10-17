@@ -64,6 +64,52 @@ const ZoneLabel = styled.div`
   border: 1px solid rgba(255, 255, 255, 0.2);
 `;
 
+const ZoomControls = styled.div`
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 1000;
+`;
+
+const ZoomButton = styled.button`
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #333;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 1);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+`;
+
 const Canvas = ({
   items,
   selectedItemId,
@@ -194,6 +240,57 @@ const Canvas = ({
     // New translation so the same world point stays under cursor
     const newX = mouseX - worldX * newZoom;
     const newY = mouseY - worldY * newZoom;
+
+    updateViewport({ x: newX, y: newY, zoom: newZoom });
+  }, [viewport, updateViewport]);
+
+  // Zoom functions for buttons (zoom around center)
+  const handleZoomIn = useCallback(() => {
+    const container = canvasRef.current?.parentElement;
+    if (!container) return;
+
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
+    
+    // Center of the viewport
+    const centerX = containerWidth / 2;
+    const centerY = containerHeight / 2;
+
+    const step = 0.2;
+    const newZoom = Math.min(3, viewport.zoom * (1 + step));
+
+    // World coordinates at center before zoom
+    const worldX = (centerX - viewport.x) / viewport.zoom;
+    const worldY = (centerY - viewport.y) / viewport.zoom;
+
+    // New translation so the center stays at center
+    const newX = centerX - worldX * newZoom;
+    const newY = centerY - worldY * newZoom;
+
+    updateViewport({ x: newX, y: newY, zoom: newZoom });
+  }, [viewport, updateViewport]);
+
+  const handleZoomOut = useCallback(() => {
+    const container = canvasRef.current?.parentElement;
+    if (!container) return;
+
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
+    
+    // Center of the viewport
+    const centerX = containerWidth / 2;
+    const centerY = containerHeight / 2;
+
+    const step = 0.2;
+    const newZoom = Math.max(0.1, viewport.zoom * (1 - step));
+
+    // World coordinates at center before zoom
+    const worldX = (centerX - viewport.x) / viewport.zoom;
+    const worldY = (centerY - viewport.y) / viewport.zoom;
+
+    // New translation so the center stays at center
+    const newX = centerX - worldX * newZoom;
+    const newY = centerY - worldY * newZoom;
 
     updateViewport({ x: newX, y: newY, zoom: newZoom });
   }, [viewport, updateViewport]);
@@ -383,6 +480,24 @@ const Canvas = ({
           ))}
         </AnimatePresence>
       </CanvasContent>
+
+      {/* Zoom Controls */}
+      <ZoomControls>
+        <ZoomButton
+          onClick={handleZoomIn}
+          disabled={viewport.zoom >= 3}
+          title="Zoom In"
+        >
+          +
+        </ZoomButton>
+        <ZoomButton
+          onClick={handleZoomOut}
+          disabled={viewport.zoom <= 0.1}
+          title="Zoom Out"
+        >
+          −
+        </ZoomButton>
+      </ZoomControls>
 
       {/* Instructions */}
       <div style={{

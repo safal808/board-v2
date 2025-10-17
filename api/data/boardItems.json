@@ -1207,5 +1207,74 @@
     "rotation": 0,
     "createdAt": "2025-10-17T08:04:39.562Z",
     "updatedAt": "2025-10-17T08:04:39.562Z"
+  },
+  {
+    "id": "item-1760698876342-0mwk31",
+    "type": "agent",
+    "x": 5380,
+    "y": 60,
+    "width": 520,
+    "height": 557,
+    "content": "# Risk Assessment\n\n## Risk Level: HIGH\n\n### Factors\n1. **Medication Interaction**\n   - Multiple hepatotoxic agents\n   - Monitoring gap identified\n\n2. **Clinical Symptoms**\n   - Worsening fatigue\n   - Timeline correlation\n\n### Probability: 75%\n\n### Actions Required\n- Urgent LFT panel\n- Hepatology referral",
+    "color": "#ffffff",
+    "rotation": 0,
+    "agentData": {
+      "title": "Auto-Positioned Analysis",
+      "markdown": "# Risk Assessment\n\n## Risk Level: HIGH\n\n### Factors\n1. **Medication Interaction**\n   - Multiple hepatotoxic agents\n   - Monitoring gap identified\n\n2. **Clinical Symptoms**\n   - Worsening fatigue\n   - Timeline correlation\n\n### Probability: 75%\n\n### Actions Required\n- Urgent LFT panel\n- Hepatology referral"
+    },
+    "createdAt": "2025-10-17T11:01:16.345Z",
+    "updatedAt": "2025-10-17T11:01:16.501Z"
+  },
+  {
+    "id": "item-1760698882640-6ynng4",
+    "type": "agent",
+    "x": 4260,
+    "y": 550,
+    "width": 520,
+    "height": 557,
+    "content": "# Risk Assessment\n\n## Risk Level: HIGH\n\n### Factors\n1. **Medication Interaction**\n   - Multiple hepatotoxic agents\n   - Monitoring gap identified\n\n2. **Clinical Symptoms**\n   - Worsening fatigue\n   - Timeline correlation\n\n### Probability: 75%\n\n### Actions Required\n- Urgent LFT panel\n- Hepatology referral",
+    "color": "#ffffff",
+    "rotation": 0,
+    "agentData": {
+      "title": "Auto-Positioned Analysis",
+      "markdown": "# Risk Assessment\n\n## Risk Level: HIGH\n\n### Factors\n1. **Medication Interaction**\n   - Multiple hepatotoxic agents\n   - Monitoring gap identified\n\n2. **Clinical Symptoms**\n   - Worsening fatigue\n   - Timeline correlation\n\n### Probability: 75%\n\n### Actions Required\n- Urgent LFT panel\n- Hepatology referral"
+    },
+    "createdAt": "2025-10-17T11:01:22.642Z",
+    "updatedAt": "2025-10-17T11:01:22.781Z"
+  },
+  {
+    "id": "item-1760700587808-gilxs8qo0",
+    "type": "ehr",
+    "x": 7632.444567665642,
+    "y": 6968.283448406733,
+    "width": 550,
+    "height": 450,
+    "content": "EHR Data",
+    "color": "#e8f5e8",
+    "rotation": 0,
+    "ehrData": {
+      "encounter_id": "new_encounter_123",
+      "source_system": "Nervecentre EHR",
+      "patient": {
+        "id": "pt_000392",
+        "mrn": "MRN-7342291",
+        "name": "John McAllister"
+      }
+    },
+    "createdAt": "2025-10-17T11:29:47.808Z",
+    "updatedAt": "2025-10-17T11:29:47.808Z"
+  },
+  {
+    "id": "item-1760700886094-pznvw2phd",
+    "type": "ehr-data",
+    "title": "Biochemistry Panel",
+    "content": "Sodium: 142 mmol/L (136-145)\nPotassium: 4.1 mmol/L (3.5-5.1)\nUrea: 5.2 mmol/L (2.5-7.5)\nCreatinine: 85 μmol/L (62-106)",
+    "dataType": "laboratory",
+    "source": "ICE",
+    "x": 4260,
+    "y": -4540,
+    "width": 400,
+    "height": 300,
+    "timestamp": "2025-10-17T11:34:46.095Z"
   }
 ]

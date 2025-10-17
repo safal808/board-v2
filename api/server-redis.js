@@ -113,6 +113,14 @@ const TASK_ZONE = {
   height: 2100,
 };
 
+// Retrieved Data Zone boundaries
+const RETRIEVED_DATA_ZONE = {
+  x: 4200,
+  y: -4600,
+  width: 2000,
+  height: 2100,
+};
+
 // Find position within Task Management Zone with proper spacing
 const findTaskZonePosition = (newItem, existingItems) => {
   const padding = 60; // Space between items and zone border (increased for better spacing)
@@ -182,6 +190,81 @@ const findTaskZonePosition = (newItem, existingItems) => {
   // If no grid position available, stack vertically in first column
   const x = TASK_ZONE.x + padding;
   const y = TASK_ZONE.y + 60 + taskZoneItems.length * (rowHeight + padding);
+
+  console.log(`⚠️  Grid full, stacking vertically at (${x}, ${y})`);
+  return { x, y };
+};
+
+// Find position within Retrieved Data Zone with proper spacing
+const findRetrievedDataZonePosition = (newItem, existingItems) => {
+  const padding = 60; // Space between items and zone border (increased for better spacing)
+  const rowHeight = 490; // Standard row height for items (450px + 40px spacing)
+  const colWidth = 560; // Standard column width for items (520px item + 40px spacing)
+
+  // Filter existing items to only those in the Retrieved Data Zone
+  const retrievedDataZoneItems = existingItems.filter(
+    (item) =>
+      item.x >= RETRIEVED_DATA_ZONE.x &&
+      item.x < RETRIEVED_DATA_ZONE.x + RETRIEVED_DATA_ZONE.width &&
+      item.y >= RETRIEVED_DATA_ZONE.y &&
+      item.y < RETRIEVED_DATA_ZONE.y + RETRIEVED_DATA_ZONE.height &&
+      (item.type === "ehr-data" ||
+        item.type === "lab-result" ||
+        item.type === "patient-data" ||
+        item.type === "clinical-data")
+  );
+
+  console.log(
+    `🎯 Finding position in Retrieved Data Zone for ${newItem.type} item`
+  );
+  console.log(
+    `📊 Found ${retrievedDataZoneItems.length} existing EHR data items in Retrieved Data Zone`
+  );
+
+  // Calculate grid positions
+  const maxCols = Math.floor(RETRIEVED_DATA_ZONE.width / colWidth);
+  const maxRows = Math.floor(RETRIEVED_DATA_ZONE.height / rowHeight);
+
+  console.log(
+    `📐 Grid capacity: ${maxCols} columns × ${maxRows} rows = ${
+      maxCols * maxRows
+    } positions`
+  );
+
+  // Create a grid to track occupied positions
+  const grid = Array(maxRows)
+    .fill(null)
+    .map(() => Array(maxCols).fill(false));
+
+  // Mark occupied positions
+  retrievedDataZoneItems.forEach((item) => {
+    const col = Math.floor((item.x - RETRIEVED_DATA_ZONE.x) / colWidth);
+    const row = Math.floor((item.y - RETRIEVED_DATA_ZONE.y - 60) / rowHeight); // Adjust for starting Y offset
+
+    if (row >= 0 && row < maxRows && col >= 0 && col < maxCols) {
+      grid[row][col] = true;
+      console.log(`🔒 Position occupied: row ${row}, col ${col} by ${item.id}`);
+    }
+  });
+
+  // Find first available position (left to right, top to bottom)
+  for (let row = 0; row < maxRows; row++) {
+    for (let col = 0; col < maxCols; col++) {
+      if (!grid[row][col]) {
+        const x = RETRIEVED_DATA_ZONE.x + col * colWidth + padding;
+        const y = RETRIEVED_DATA_ZONE.y + row * rowHeight + 60; // Start at 60px from top of zone
+
+        console.log(
+          `✅ Found available position: row ${row}, col ${col} at (${x}, ${y})`
+        );
+        return { x, y };
+      }
+    }
+  }
+
+  // If no grid position available, stack vertically in first column
+  const x = RETRIEVED_DATA_ZONE.x + padding;
+  const y = RETRIEVED_DATA_ZONE.y + 60 + retrievedDataZoneItems.length * (rowHeight + padding);
 
   console.log(`⚠️  Grid full, stacking vertically at (${x}, ${y})`);
   return { x, y };
@@ -697,6 +780,71 @@ app.post('/api/lab-results', async (req, res) => {
   } catch (error) {
     console.error('Error creating lab result:', error);
     res.status(500).json({ error: 'Failed to create lab result' });
+  }
+});
+
+// POST /api/ehr-data - Create a new EHR data item in Retrieved Data Zone
+app.post('/api/ehr-data', async (req, res) => {
+  try {
+    const { title, content, dataType, source, x, y, width, height } = req.body || {};
+
+    if (!title || !content) {
+      return res.status(400).json({
+        error: 'Title and content are required for EHR data items'
+      });
+    }
+
+    const existingItems = await loadBoardItems();
+    const itemId = `item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+    // Determine positioning
+    let itemX, itemY;
+    if (x !== undefined && y !== undefined) {
+      itemX = x;
+      itemY = y;
+      console.log(`📍 Using provided coordinates for EHR DATA item at (${itemX}, ${itemY})`);
+    } else {
+      // Auto-positioning - use Retrieved Data Zone
+      const tempItem = { type: 'ehr-data', width: width || 400, height: height || 300 };
+      const retrievedDataPosition = findRetrievedDataZonePosition(tempItem, existingItems);
+      itemX = retrievedDataPosition.x;
+      itemY = retrievedDataPosition.y;
+      console.log(`📍 Auto-positioned EHR DATA item in Retrieved Data Zone at (${itemX}, ${itemY})`);
+    }
+
+    const newItem = {
+      id: itemId,
+      type: 'ehr-data',
+      title: title,
+      content: content,
+      dataType: dataType || 'clinical',
+      source: source || 'EHR System',
+      x: itemX,
+      y: itemY,
+      width: width || 400,
+      height: height || 300,
+      timestamp: new Date().toISOString()
+    };
+
+    // Add to items array
+    existingItems.push(newItem);
+
+    // Save to Redis
+    await saveBoardItems(existingItems);
+
+    console.log(`✅ Created EHR data item: ${itemId} - "${title}"`);
+
+    // Notify live clients via SSE (new-item)
+    const sseMessage = {
+      type: 'new-item',
+      item: newItem
+    };
+    broadcastSSE(sseMessage);
+
+    res.status(201).json(newItem);
+  } catch (error) {
+    console.error('Error creating EHR data item:', error);
+    res.status(500).json({ error: 'Failed to create EHR data item' });
   }
 });
 

@@ -167,7 +167,9 @@ curl -X POST http://localhost:3001/api/focus \
 
 ## 5. Create Agent Item
 
-Create an agent result card at viewport center:
+### Manual Positioning
+
+Create an agent result card at specific coordinates:
 
 ```bash
 curl -X POST http://localhost:3001/api/agents \
@@ -180,16 +182,16 @@ curl -X POST http://localhost:3001/api/agents \
   }' | jq
 ```
 
-Create agent with markdown formatting:
+### Auto-positioned Agent
+
+Let the system automatically position the agent in the Task Management Zone:
 
 ```bash
 curl -X POST http://localhost:3001/api/agents \
   -H "Content-Type: application/json" \
   -d '{
-    "title": "Risk Analysis",
-    "content": "# Risk Assessment\n\n## Risk Level: HIGH\n\n### Factors\n1. **Medication Interaction**\n   - Multiple hepatotoxic agents\n   - Monitoring gap identified\n\n2. **Clinical Symptoms**\n   - Worsening fatigue\n   - Timeline correlation\n\n### Probability: 75%\n\n### Actions Required\n- Urgent LFT panel\n- Hepatology referral",
-    "x": 950,
-    "y": 300
+    "title": "Auto-Positioned Analysis",
+    "content": "# Risk Assessment\n\n## Risk Level: HIGH\n\n### Factors\n1. **Medication Interaction**\n   - Multiple hepatotoxic agents\n   - Monitoring gap identified\n\n2. **Clinical Symptoms**\n   - Worsening fatigue\n   - Timeline correlation\n\n### Probability: 75%\n\n### Actions Required\n- Urgent LFT panel\n- Hepatology referral"
   }' | jq
 ```
 
@@ -197,7 +199,9 @@ curl -X POST http://localhost:3001/api/agents \
 
 ## 4. Create Todo List
 
-Create a todo list with multiple items:
+### Manual Positioning
+
+Create a todo list with multiple items at specific coordinates:
 
 ```bash
 curl -X POST http://localhost:3001/api/todos \
@@ -217,30 +221,32 @@ curl -X POST http://localhost:3001/api/todos \
   }' | jq
 ```
 
-Create todo with status tracking:
+### Auto-positioned Todo
+
+Let the system automatically position the todo in the Task Management Zone:
 
 ```bash
 curl -X POST http://localhost:3001/api/todos \
   -H "Content-Type: application/json" \
   -d '{
-    "title": "Patient Education",
-    "description": "Topics to discuss with patient",
+    "title": "Auto-Positioned Tasks",
+    "description": "System will find the best position",
     "todo_items": [
       {"text": "Medication adherence", "status": "done"},
       {"text": "Dietary modifications", "status": "in_progress"},
       {"text": "Exercise recommendations", "status": "todo"},
       {"text": "Warning signs to watch", "status": "todo"}
-    ],
-    "x": 400,
-    "y": 800
+    ]
   }' | jq
 ```
 
 ---
 
-## 5. Create Lab Result
+## 6. Create Lab Result
 
-Create a lab result card with optimal status:
+### Manual Positioning
+
+Create a lab result card with optimal status at specific coordinates:
 
 ```bash
 curl -X POST http://localhost:3001/api/lab-results \
@@ -262,7 +268,9 @@ curl -X POST http://localhost:3001/api/lab-results \
   }' | jq
 ```
 
-Create lab result with warning status:
+### Auto-positioned Lab Results
+
+Let the system automatically position lab results in the Task Management Zone:
 
 ```bash
 curl -X POST http://localhost:3001/api/lab-results \
@@ -278,13 +286,11 @@ curl -X POST http://localhost:3001/api/lab-results \
       "warningMin": 3,
       "warningMax": 10
     },
-    "trend": "up",
-    "x": 850,
-    "y": 1200
+    "trend": "up"
   }' | jq
 ```
 
-Create lab result with critical status:
+Create critical lab result (auto-positioned):
 
 ```bash
 curl -X POST http://localhost:3001/api/lab-results \
@@ -300,9 +306,7 @@ curl -X POST http://localhost:3001/api/lab-results \
       "criticalMin": 7,
       "criticalMax": 56
     },
-    "trend": "up",
-    "x": 1300,
-    "y": 1200
+    "trend": "up"
   }' | jq
 ```
 
@@ -310,7 +314,99 @@ curl -X POST http://localhost:3001/api/lab-results \
 
 ---
 
-## 6. Focus on Item
+## 7. Create EHR Data Item
+
+### Auto-positioned EHR Data (Retrieved Data Zone)
+
+Create EHR data items that are automatically positioned in the Retrieved Data Zone:
+
+```bash
+curl -X POST http://localhost:3001/api/ehr-data \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Patient Vitals - Emergency Department",
+    "content": "BP: 140/90 mmHg, HR: 95 bpm, Temp: 38.2°C, SpO2: 96%",
+    "dataType": "vitals",
+    "source": "Nervecentre"
+  }' | jq
+```
+
+Create clinical notes EHR data:
+
+```bash
+curl -X POST http://localhost:3001/api/ehr-data \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Discharge Summary",
+    "content": "Patient admitted with chest pain. ECG normal. Troponin negative. Discharged with follow-up cardiology appointment.",
+    "dataType": "clinical-notes",
+    "source": "Medilogik"
+  }' | jq
+```
+
+### Manual Positioning
+
+Create EHR data with specific coordinates:
+
+```bash
+curl -X POST http://localhost:3001/api/ehr-data \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Lab Results - Biochemistry",
+    "content": "Na: 142 mmol/L, K: 4.1 mmol/L, Urea: 5.2 mmol/L, Creatinine: 85 μmol/L",
+    "dataType": "laboratory",
+    "source": "ICE",
+    "x": 4300,
+    "y": -4400,
+    "width": 450,
+    "height": 320
+  }' | jq
+```
+
+**Note**: EHR data items without coordinates are automatically positioned in the Retrieved Data Zone (x: 4200-6200, y: -4600 to -2500) using the same intelligent grid layout as the Task Management Zone.
+
+### Example: Complete EHR Data Workflow
+
+```bash
+# Create multiple EHR data items to see auto-positioning in action
+echo "Creating EHR data items in Retrieved Data Zone..."
+
+# Patient vitals from Nervecentre
+curl -s -X POST http://localhost:3001/api/ehr-data \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Emergency Department Vitals",
+    "content": "BP: 140/90 mmHg\nHR: 95 bpm\nTemp: 38.2°C\nSpO2: 96%\nRR: 22/min",
+    "dataType": "vitals",
+    "source": "Nervecentre"
+  }' | jq '.id'
+
+# Lab results from ICE
+curl -s -X POST http://localhost:3001/api/ehr-data \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Biochemistry Panel",
+    "content": "Sodium: 142 mmol/L (136-145)\nPotassium: 4.1 mmol/L (3.5-5.1)\nUrea: 5.2 mmol/L (2.5-7.5)\nCreatinine: 85 μmol/L (62-106)",
+    "dataType": "laboratory",
+    "source": "ICE"
+  }' | jq '.id'
+
+# Clinical notes from Medilogik
+curl -s -X POST http://localhost:3001/api/ehr-data \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Discharge Summary",
+    "content": "Patient presented with chest pain. ECG showed normal sinus rhythm. Troponin levels negative at 0, 6, and 12 hours. Stress test scheduled as outpatient. Discharged with cardiology follow-up in 2 weeks.",
+    "dataType": "clinical-notes",
+    "source": "Medilogik"
+  }' | jq '.id'
+
+echo "All EHR data items created and auto-positioned in Retrieved Data Zone!"
+```
+
+---
+
+## 8. Focus on Item
 
 Focus the canvas viewport on a specific item:
 
@@ -345,7 +441,7 @@ Available zones:
 
 ---
 
-## 7. Reset Server Cache
+## 8. Reset Server Cache
 
 Force reload data from file (clears in-memory items):
 
@@ -355,7 +451,7 @@ curl -X POST http://localhost:3001/api/reset-cache | jq
 
 ---
 
-## 8. Server-Sent Events (SSE)
+## 9. Server-Sent Events (SSE)
 
 Listen for real-time events:
 
@@ -372,7 +468,7 @@ This will show:
 
 ---
 
-## 9. Batch Operations
+## 10. Batch Operations
 
 Create multiple items at once:
 
@@ -409,7 +505,7 @@ curl -s -X POST http://localhost:3001/api/focus \
 
 ---
 
-## 10. Query and Filter Items
+## 11. Query and Filter Items
 
 Get only agent items:
 
@@ -443,49 +539,75 @@ curl -s http://localhost:3001/api/board-items | jq 'group_by(.type) | map({type:
 
 ---
 
-## 11. Coordinate System
+## 12. Auto Positioning System
 
-The canvas uses a world coordinate system:
+The system automatically positions API-created items (agents, todos, lab results) in the **Task Management Zone** when no coordinates are provided.
 
-- **Origin**: Top-left (0, 0)
-- **X-axis**: Increases to the right
-- **Y-axis**: Increases downward
-- **Typical viewport**: 1920x1080 pixels
-- **Canvas space**: 8000x7000 pixels (default)
+### Task Management Zone
 
-### Positioning Tips:
+- **Location**: x: 4200, y: 0
+- **Size**: 2000px × 2100px
+- **Grid Layout**: Intelligent grid positioning with collision detection
+- **Item Spacing**: 60px padding, 560px column width, 490px row height
 
-**Top-left quadrant**:
+### How Auto Positioning Works
 
-```json
-{ "x": 100, "y": 100 }
-```
+1. **Grid-based Layout**: Items are arranged in a grid pattern within the Task Management Zone
+2. **Collision Detection**: System checks for existing items and finds the next available position
+3. **Left-to-Right, Top-to-Bottom**: Fills positions systematically
+4. **Overflow Handling**: If grid is full, items stack vertically in the first column
 
-**Center of viewport** (assuming 1920x1080):
+### Manual vs Auto Positioning
 
-```json
-{ "x": 960, "y": 540 }
-```
-
-**Spread items horizontally**:
+**Auto Positioning** (recommended):
 
 ```json
-{"x": 400, "y": 200}   // Item 1
-{"x": 950, "y": 200}   // Item 2
-{"x": 1500, "y": 200}  // Item 3
+{
+  "title": "My Item",
+  "content": "Content here"
+  // No x, y coordinates - system auto-positions
+}
 ```
 
-**Spread items vertically**:
+**Manual Positioning**:
 
 ```json
-{"x": 400, "y": 200}   // Item 1
-{"x": 400, "y": 700}   // Item 2
-{"x": 400, "y": 1200}  // Item 3
+{
+  "title": "My Item",
+  "content": "Content here",
+  "x": 1000,
+  "y": 500
+}
 ```
+
+### Zone Configuration
+
+The canvas is divided into zones defined in `src/data/zone-config.json`:
+
+- **Adverse Events Zone**: x: 0, y: 0 (4000×2100px)
+- **Raw EHR Data Zone**: x: 0, y: -4600 (4000×3000px)
+- **Data Zone**: x: 0, y: -1300 (4000×1000px)
+- **Task Management Zone**: x: 4200, y: 0 (2000×2100px) - API items auto-positioned here
 
 ---
 
-## 12. Complete Example Workflow
+## 13. Task Zone Management
+
+### Clear Task Zone
+
+Remove all API-created items from the Task Management Zone:
+
+```bash
+curl -X DELETE http://localhost:3001/api/task-zone | jq
+```
+
+This removes only API-created items (agents, todos, lab results) from the Task Management Zone, leaving other items untouched.
+
+---
+
+## 14. Complete Example Workflow
+
+### Auto-Positioning Workflow
 
 ```bash
 #!/bin/bash
@@ -494,37 +616,92 @@ The canvas uses a world coordinate system:
 echo "=== Checking server health ==="
 curl -s http://localhost:3001/api/health | jq
 
-# 2. Reset cache to load fresh data
-echo -e "\n=== Resetting cache ==="
-curl -s -X POST http://localhost:3001/api/reset-cache | jq
+# 2. Clear Task Zone (optional - removes existing API items)
+echo -e "\n=== Clearing Task Zone ==="
+curl -s -X DELETE http://localhost:3001/api/task-zone | jq
 
-# 3. Get current items
-echo -e "\n=== Current items ==="
-curl -s http://localhost:3001/api/board-items | jq 'map({id, type, title: (.agentData.title // .todoData.title // .labResultData.parameter)})'
-
-# 4. Create new agent
-echo -e "\n=== Creating agent ==="
+# 3. Create auto-positioned items (no coordinates needed)
+echo -e "\n=== Creating auto-positioned agent ==="
 AGENT_ID=$(curl -s -X POST http://localhost:3001/api/agents \
   -H "Content-Type: application/json" \
   -d '{
-    "title": "New Assessment",
-    "content": "# Clinical Notes\n\nPatient showing improvement.",
-    "x": 2000,
-    "y": 500
+    "title": "Patient Assessment",
+    "content": "# Clinical Assessment\n\n## Key Findings\n- Patient showing improvement\n- Vital signs stable"
   }' | jq -r '.id')
 
-echo "Created agent: $AGENT_ID"
+echo "Created auto-positioned agent: $AGENT_ID"
 
-# 5. Focus on the new agent
-echo -e "\n=== Focusing on agent ==="
+echo -e "\n=== Creating auto-positioned todo ==="
+TODO_ID=$(curl -s -X POST http://localhost:3001/api/todos \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Clinical Tasks",
+    "description": "Auto-positioned in Task Zone",
+    "todo_items": [
+      "Review lab results",
+      "Update care plan",
+      "Schedule follow-up"
+    ]
+  }' | jq -r '.id')
+
+echo "Created auto-positioned todo: $TODO_ID"
+
+echo -e "\n=== Creating auto-positioned lab result ==="
+LAB_ID=$(curl -s -X POST http://localhost:3001/api/lab-results \
+  -H "Content-Type: application/json" \
+  -d '{
+    "parameter": "Hemoglobin",
+    "value": 12.5,
+    "unit": "g/dL",
+    "status": "optimal",
+    "range": {
+      "min": 12,
+      "max": 16
+    },
+    "trend": "stable"
+  }' | jq -r '.id')
+
+echo "Created auto-positioned lab result: $LAB_ID"
+
+# 4. View all items in Task Zone
+echo -e "\n=== Items in Task Management Zone ==="
+curl -s http://localhost:3001/api/board-items | jq '[.[] | select(.x >= 4200 and .x < 6200 and .y >= 0 and .y < 2100) | {id, type, x, y, title: (.agentData.title // .todoData.title // .labResultData.parameter)}]'
+
+# 5. Focus on the Task Management Zone
+echo -e "\n=== Focusing on Task Zone ==="
 curl -s -X POST http://localhost:3001/api/focus \
   -H "Content-Type: application/json" \
-  -d "{\"objectId\":\"$AGENT_ID\"}" | jq
+  -d "{\"itemId\":\"$AGENT_ID\"}" | jq
 
-echo -e "\n=== Done ==="
+echo -e "\n=== Auto-positioning workflow complete ==="
 ```
 
-Save this as `workflow.sh`, make it executable with `chmod +x workflow.sh`, and run with `./workflow.sh`.
+Save this as `auto-workflow.sh`, make it executable with `chmod +x auto-workflow.sh`, and run with `./auto-workflow.sh`.
+
+---
+
+## 15. Auto Positioning Benefits
+
+### Why Use Auto Positioning?
+
+1. **Organized Layout**: Items are automatically arranged in a clean grid within their designated zones
+2. **No Collision Issues**: System prevents overlapping items automatically
+3. **Consistent Spacing**: Uniform gaps between items for better readability
+4. **Scalable**: Works with any number of items - system handles overflow intelligently
+5. **Zone-based Organization**: API items are grouped together in their dedicated zones (Task Management Zone for operational items, Retrieved Data Zone for EHR data)
+
+### When to Use Manual Positioning
+
+- **Specific Layout Requirements**: When you need items in exact locations
+- **Integration with Existing Items**: When positioning relative to pre-existing canvas elements
+- **Custom Workflows**: When building specialized layouts outside the standard zones
+
+### Best Practices
+
+- **Default to Auto Positioning**: Let the system handle positioning for most API calls
+- **Use Manual Positioning Sparingly**: Only when you have specific layout requirements
+- **Clear Task Zone Periodically**: Use `DELETE /api/task-zone` to reset the layout when needed
+- **Monitor Zone Capacity**: The Task Zone can hold approximately 20 items in the standard grid
 
 ---
 
@@ -535,4 +712,9 @@ Save this as `workflow.sh`, make it executable with `chmod +x workflow.sh`, and 
 - The `-s` flag in curl makes it silent (no progress bar)
 - The `-N` flag in curl disables buffering (needed for SSE)
 - Item IDs are auto-generated in format: `item-{timestamp}-{random}`
-- Coordinates (x, y) are optional - server will use random positions if not provided
+- **Auto Positioning**: Omit `x` and `y` coordinates to use intelligent auto-positioning in designated zones
+- **Manual Positioning**: Include `x` and `y` coordinates for specific placement
+- **Task Zone**: API items (agents, todos, lab results) are automatically organized in the Task Management Zone (x: 4200-6200, y: 0-2100)
+- **Retrieved Data Zone**: EHR data items are automatically organized in the Retrieved Data Zone (x: 4200-6200, y: -4600 to -2500)
+- **Grid Layout**: Auto-positioned items use a 560px × 490px grid with 60px padding in both zones
+- **Collision Detection**: System prevents overlapping items when auto-positioning
